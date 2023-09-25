@@ -51,7 +51,7 @@ def b0_correction(offsets, zspec, b0_map):
     points = np.size(zspec, 2)
     zspec = np.reshape(zspec, (matrix_x*matrix_y, points, -1))
     b0_map = np.reshape(b0_map, (matrix_x*matrix_y, -1))
-    ##Flip for interpolation##
+    #Flip for interpolation##
     zspec = np.flip(zspec, axis=1)
     offsets = np.flip(offsets)
     ##Iterate through each spectrum with corresponding B0 shift##

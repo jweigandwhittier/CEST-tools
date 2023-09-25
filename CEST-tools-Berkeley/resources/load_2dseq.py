@@ -11,11 +11,11 @@ import tkinter as tk
 import tkinter.messagebox as tkmb
 import tkinter.filedialog as tkfd
 
-def get_paths(acq_type):
+def get_paths_cest(acq_type):
     ##Get filepath for data directory##
     tkmb.showinfo('JCT', 'Select data directory', icon='info')
     data_directory = tk.filedialog.askdirectory()
-    #Get filepath for M0##
+    ##Get filepath for M0##
     tk.messagebox.showinfo('CEST 2Dseq', 'Select M0', icon='info')
     m0_path = tk.filedialog.askdirectory(initialdir = data_directory)
     ##Get filepath for  continuous CEST data##
@@ -40,9 +40,40 @@ def get_paths(acq_type):
     wassr_experiment = tk.filedialog.askdirectory(initialdir = data_directory)
     wassr_paths = [wassr_experiment]
     ##Return filepaths##
-    return cest_experiment_name, cest_paths, wassr_paths, m0_path
+    return data_directory, cest_experiment_name, cest_paths, wassr_paths, m0_path
 
-def load_2dseq(exp_paths, m0_path):
+def load_2dseq_b1(data_directory):
+    methods = []
+    fids = []
+    angles = []
+    ##Get directories##
+    tkmb.showinfo('JCT', 'Select 60 degree FA', icon = 'info')
+    angle_60_directory = tk.filedialog.askdirectory(intitialdir = data_directory)
+    tkmb.showinfo('JCT', 'Select 120 degree FA', icon = 'info')
+    angle_120_directory = tk.filedialog.askdirectory(initialdir = data_directory)
+    paths = [angle_60_directory, angle_120_directory]
+    ##Load file contents##
+    for path in paths:
+        filepath_2dseq = path+'/pdata/1/2dseq'
+        filepath_method = path+'/method'
+        method = open(filepath_method)
+        fid = open(filepath_2dseq, 'rb')
+        methods.append(method)
+        fids.append(fid)
+    for line in methods[0]:
+        if '$PVM_Matrix' in line:
+            matrix = next(method).split()
+            matrix = [eval(i) for i in matrix]
+        if '$PVM_SPackArrNSlices' in line:
+            slices = eval(next(method))
+    for i in range(np.size(fids)):
+        image = np.fromfile(fids[i], np.int16)
+        image = np.reshape(image, (matrix[0], matrix[1], slices), order = 'F')
+        image = np.rot90(image, k=1, axes=(1,0))  
+        angles.append(image)
+    return angles
+
+def load_2dseq_cest(exp_paths, m0_path):
     ##Load file contents to list##
     methods = []
     fids = []    
@@ -86,7 +117,7 @@ def load_2dseq(exp_paths, m0_path):
         parameters.append(parameter_dct)
     ##Load raw data into array and reshape##
     m0_image = np.fromfile(m0_fid, np.int16)
-    m0_image = np.reshape(m0_image, (parameters[0]['Matrix'][0], parameters[0]['Matrix'][0], parameters[0]['Slices'], 1), order = 'F')
+    m0_image = np.reshape(m0_image, (parameters[0]['Matrix'][0], parameters[0]['Matrix'][0], parameters[0]['Slices']), order = 'F')
     for i in range(np.size(fids)):
         image = np.fromfile(fids[i], np.int16)
         image = np.reshape(image, (parameters[i]['Matrix'][0], parameters[i]['Matrix'][0], parameters[i]['Slices'], parameters[i]['Offsets']), order = 'F')
@@ -103,10 +134,10 @@ def load_2dseq(exp_paths, m0_path):
     ##Swap axes for order (matrix_x, matrix_y, offsets, slices)
     zspecs = np.swapaxes(zspecs, 2, 3)
     ##Flip image ordering to match NMR convention##
-    zspecs = np.flip(zspecs, axis=3)
+    zspecs = np.flip(zspecs, axis=2)
     ##Flip offset list to match ordering##
     ppm_list = np.flip(ppm_list)   
-    # ##Rotate 90-degrees##        
+    ##Rotate 90-degrees##        
     m0_image = np.rot90(m0_image, k=1, axes=(1,0))        
     zspecs = np.rot90(zspecs, k=1, axes=(1,0))
     # ##Return images and offset list##
