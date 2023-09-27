@@ -49,6 +49,7 @@ def spectrum_roi_phantom(m0_image, data):
         roi_list.append("%i" % i)
     ##Empty list for masks##
     masks = np.zeros((data.shape + (len(roi_list),)))
+    map_mask = np.zeros((m0_image.shape + (len(roi_list),)))
     ##Draw ROIs##
     for i in range(np.size(m0_image, 2)):
         imslice = m0_image[:,:,i]
@@ -61,16 +62,19 @@ def spectrum_roi_phantom(m0_image, data):
         for name, roi in multiroi_named.rois.items():
             j = int(name)
             mask = roi.get_mask(imslice)
-            mask = np.stack([mask]*np.size(data, 2), -1)
+            mask_spectrum = np.stack([mask]*np.size(data, 2), -1)
             ##Apply masks to spectral data##
-            data_mask = dataslice*mask
+            data_mask = dataslice*mask_spectrum
             ##Store masks in array##
             masks[:,:,:,i,j] = data_mask
-    return masks
+            map_mask[:,:,i,j] = mask
+    return masks, map_mask
+
 #Cardiac#
 def spectrum_roi_cardiac(m0_image, data):
     roi_list = ['LV exterior', 'LV interior']
     masks = np.zeros((data.shape + (1,)))
+    map_mask = np.zeros((m0_image.shape))
     for i in range(np.size(m0_image, 2)):
           imslice = m0_image[:,:,i]
           dataslice = data[:,:,:,i]
@@ -81,9 +85,10 @@ def spectrum_roi_cardiac(m0_image, data):
           mask_exterior = multiroi_named.rois['LV exterior'].get_mask(imslice)
           mask_interior = multiroi_named.rois['LV interior'].get_mask(imslice)
           mask = np.logical_and(mask_exterior, np.logical_not(mask_interior))
-          mask = np.stack([mask]*np.size(data, 2), -1)
+          mask_spectrum = np.stack([mask]*np.size(data, 2), -1)
           ##Apply masks to spectral data##
-          data_mask = dataslice*mask
+          data_mask = dataslice*mask_spectrum
           ##Store masks in array##
           masks[:,:,:,i,0] = data_mask
-    return masks
+          map_mask[:,:,i] = mask
+    return masks, map_mask

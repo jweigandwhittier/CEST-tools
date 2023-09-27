@@ -101,7 +101,7 @@ def fitting(cest_offsets, zspecs):
         background = water_fit + mt_fit
         lorentzian_difference = 1 - (zspecs + background)
         ##Step 2##
-        fit_2, _ = curve_fit(step_2_fit, cest_offsets, lorentzian_difference, p0=p0_2, bounds=(lb_2, ub_2))
+        fit_2, _ = curve_fit(step_2_fit, cest_offsets, lorentzian_difference, p0=p0_2, bounds=(lb_2, ub_2), maxfev = 10000)
         ##Calulate NOE, creatine, and amide fits from parameters##
         noe_fit = lorentzian(cest_offsets, fit_2[0], fit_2[1], fit_2[2])
         creatine_fit = lorentzian(cest_offsets, fit_2[3], fit_2[4], fit_2[5])
@@ -110,38 +110,25 @@ def fitting(cest_offsets, zspecs):
     parameters = {"Water":[fit_1[0], fit_1[1], fit_1[2]], "MT":[fit_1[3], fit_1[4], fit_1[5]], "NOE":[fit_2[0], fit_2[1], fit_2[2]], "Creatine":[fit_2[3], fit_2[4], fit_2[5]], "Amide":[fit_2[6], fit_2[7], fit_2[8]]}
     fits = {"Water":water_fit, "MT":mt_fit, "NOE":noe_fit, "Creatine":creatine_fit, "Amide":amide_fit}
     return parameters, fits
-
-def plotting(x, fits):
-    fig, ax = plt.subplots(1,1)
-    fig.suptitle("5-pool Lorentzian Fits")
-    ax.plot(x, fits["Water"], label = "Water")
-    ax.plot(x, fits["MT"], label = "MT")
-    ax.plot(x, fits["NOE"], label = "NOE")
-    ax.plot(x, fits["Creatine"], label = "Creatine")
-    ax.plot(x, fits["Amide"], label = "Amide")
-    ax.legend()
-    
     
 ##Pipelines for single spectrum and full image (voxelwise)##
 def image_data_pipeline(zspecs, offsets):
     matrix_x = np.size(zspecs,0)
     matrix_y = np.size(zspecs,1)
     slices = np.size(zspecs, 3)
-    region = np.size(zspecs, 4)
     parameters = []
     fits = []
     for i in range(matrix_x):
         for j in range(matrix_y):
             for k in range(slices):
-                for l in range(region):
-                    zspec = zspecs[i,j,:,k,l]
-                    p,f = fitting(offsets, zspec)
-                    parameters.append(p)
-                    fits.append(f)
+                zspec = zspecs[i,j,:,k]
+                p,f = fitting(offsets, zspec)
+                parameters.append(p)
+                fits.append(f)
     parameters = np.array(parameters)
     fits = np.array(fits)
-    parameters.reshape((matrix_x, matrix_y, slices, region))
-    fits.reshape((matrix_x, matrix_y, slices, region))
+    parameters = parameters.reshape((matrix_x, matrix_y, slices))
+    fits = fits.reshape((matrix_x, matrix_y, slices))
     return parameters, fits
 
 def single_spectrum_pipeline(zspecs, offsets): 
@@ -157,6 +144,6 @@ def single_spectrum_pipeline(zspecs, offsets):
             fits.append(f)
     parameters = np.array(parameters)
     fits = np.array(fits)
-    parameters.reshape((slices, region))
-    fits.reshape((slices, region))
+    parameters = parameters.reshape((slices, region))
+    fits = fits.reshape((slices, region))
     return parameters, fits

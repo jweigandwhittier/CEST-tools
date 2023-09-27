@@ -48,7 +48,7 @@ def load_2dseq_b1(data_directory):
     angles = []
     ##Get directories##
     tkmb.showinfo('JCT', 'Select 60 degree FA', icon = 'info')
-    angle_60_directory = tk.filedialog.askdirectory(intitialdir = data_directory)
+    angle_60_directory = tk.filedialog.askdirectory(initialdir = data_directory)
     tkmb.showinfo('JCT', 'Select 120 degree FA', icon = 'info')
     angle_120_directory = tk.filedialog.askdirectory(initialdir = data_directory)
     paths = [angle_60_directory, angle_120_directory]
@@ -62,10 +62,10 @@ def load_2dseq_b1(data_directory):
         fids.append(fid)
     for line in methods[0]:
         if '$PVM_Matrix' in line:
-            matrix = next(method).split()
+            matrix = next(methods[0]).split()
             matrix = [eval(i) for i in matrix]
         if '$PVM_SPackArrNSlices' in line:
-            slices = eval(next(method))
+            slices = eval(next(methods[0]))
     for i in range(np.size(fids)):
         image = np.fromfile(fids[i], np.int16)
         image = np.reshape(image, (matrix[0], matrix[1], slices), order = 'F')
