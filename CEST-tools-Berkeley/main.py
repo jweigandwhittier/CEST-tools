@@ -24,9 +24,14 @@ import numpy as np
 ##Supress runtime warnings (division warnings when normalizing z-spectra)##
 import warnings
 warnings.filterwarnings('ignore')
-    
+
 ##Get CWD##
 path = os.getcwd()
+
+##Function for creating directory##
+def make_directory(dir_name):
+    if os.path.isdir(dir_name) == False:
+        os.makedirs(dir_name)
 
 ##Identify OS##
 platform = platform.system()
@@ -160,10 +165,6 @@ if avg_zspec is not None:
 voxel_parameters, voxel_fits = image_data_pipeline(voxel_zspec, cest_offsets)
 
 ###Save spectra; B0 & B1 maps; offsets; parameters; and fits###
-def make_directory(dir_name):
-    if os.path.isdir(dir_name) == False:
-        os.makedirs(dir_name)
-        
 voxel_dir = path + "/data/" + cest_experiment_name + "/voxel"
 b0_b1_dir = path + "/data/" + cest_experiment_name + "/b0_b1"
 offsets_dir = path + "/data/" + cest_experiment_name + "/offsets"

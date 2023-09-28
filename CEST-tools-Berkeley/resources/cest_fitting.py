@@ -7,9 +7,9 @@ Purpose: Two-step Lorentzian fitting for z-spectra, adapted from Kevin Godines' 
 
 @author: JWW
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from scipy.optimize import curve_fit
 from scipy.interpolate import CubicSpline, splev, splrep 
 ##Set variables for testing##
@@ -118,7 +118,7 @@ def image_data_pipeline(zspecs, offsets):
     slices = np.size(zspecs, 3)
     parameters = []
     fits = []
-    for i in range(matrix_x):
+    for i in tqdm(range(matrix_x)):
         for j in range(matrix_y):
             for k in range(slices):
                 zspec = zspecs[i,j,:,k]
