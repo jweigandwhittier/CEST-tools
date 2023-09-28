@@ -1,4 +1,5 @@
 matplotlib==3.7.1
 numpy==1.25.0
 roipoly==0.5.4
-scipy==1.11.2
+scipy==1.11.3
+tqdm==4.66.1
