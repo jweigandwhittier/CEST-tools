@@ -11,8 +11,8 @@ import numpy as np
 ##Interpolate WASSR spectrum for B0 correction##
 def interpolate_wassr(offsets, zspec):
     ##Flip axes for cubic spline interpolation##
-    offsets = np.flip(offsets)
-    zspec = np.flip(zspec, axis=2)
+    # offsets = np.flip(offsets)
+    # zspec = np.flip(zspec, axis=2)
     ##Reshape image for easier iteration, create empty array for interpolated spectra and interpolated offsets##
     matrix_x = np.size(zspec, 0)    
     matrix_y = np.size(zspec, 1)
@@ -27,8 +27,8 @@ def interpolate_wassr(offsets, zspec):
             zspec_interp = spline(offsets_interp)
             zspecs_interp[i,:,j] = zspec_interp
     ##Flip back to original orientation and reshape##
-    zspecs_interp = np.flip(zspecs_interp, axis=1)
-    offsets_interp = np.flip(offsets_interp)
+    # zspecs_interp = np.flip(zspecs_interp, axis=1)
+    # offsets_interp = np.flip(offsets_interp)
     zspecs_interp = np.reshape(zspecs_interp, (matrix_x, matrix_y, points, -1))
     return offsets_interp, zspecs_interp
 
@@ -52,8 +52,8 @@ def b0_correction(offsets, zspec, b0_map):
     zspec = np.reshape(zspec, (matrix_x*matrix_y, points, -1))
     b0_map = np.reshape(b0_map, (matrix_x*matrix_y, -1))
     #Flip for interpolation##
-    zspec = np.flip(zspec, axis=1)
-    offsets = np.flip(offsets)
+    # zspec = np.flip(zspec, axis=1)
+    # offsets = np.flip(offsets)
     ##Iterate through each spectrum with corresponding B0 shift##
     for i in range(np.size(b0_map, 0)):
         for j in range(np.size(b0_map, 1)):
@@ -63,6 +63,6 @@ def b0_correction(offsets, zspec, b0_map):
             shifted_spectrum = np.squeeze(splev(offsets+shift_ppm, tck, der=0))
             zspec[i,:,j] = shifted_spectrum
     ##Flip back and reshape##
-    zspec = np.flip(zspec, axis=1)
+    # zspec = np.flip(zspec, axis=1)
     zspec = np.reshape(zspec, (matrix_x, matrix_y, points, -1))
     return zspec  

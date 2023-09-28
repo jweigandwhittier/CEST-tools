@@ -134,9 +134,9 @@ def load_2dseq_cest(exp_paths, m0_path):
     ##Swap axes for order (matrix_x, matrix_y, offsets, slices)
     zspecs = np.swapaxes(zspecs, 2, 3)
     ##Flip image ordering to match NMR convention##
-    zspecs = np.flip(zspecs, axis=2)
+    # zspecs = np.flip(zspecs, axis=2)
     ##Flip offset list to match ordering##
-    ppm_list = np.flip(ppm_list)   
+    # ppm_list = np.flip(ppm_list)   
     ##Rotate 90-degrees##        
     m0_image = np.rot90(m0_image, k=1, axes=(1,0))        
     zspecs = np.rot90(zspecs, k=1, axes=(1,0))

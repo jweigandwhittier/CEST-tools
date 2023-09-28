@@ -94,7 +94,7 @@ def choose_corrections(cest_zspecs, b1_map):
         cest_zspecs = cest_zspecs
     else:
         print("Please type 'y' or 'n'.")
-    if b1_map.any() != None:
+    if b1_map is not None:
         b1_prompt = input("Perform B1 correction from B1 map? ('y' or 'n'): ")
         if b1_prompt == 'y':
             print("Sorry! B1 correction not implemented yet.")
@@ -129,7 +129,7 @@ cest_masks, map_mask, image_type = choose_image_type()
 
 ###Apply masks to field maps###
 b0_map *= map_mask
-if b1_map.any != None:
+if b1_map is not None:
     b1_map *= map_mask
     
 ###Calculate Z-specs###
@@ -179,7 +179,7 @@ np.save(voxel_dir + '/voxel_parameters.npy', voxel_parameters)
 np.save(voxel_dir + '/voxel_fits.npy', voxel_fits)
 
 np.save(b0_b1_dir + '/b0_map.npy', b0_map)
-if b1_map.any != None:
+if b1_map is not None:
     np.save(b0_b1_dir + '/b1_map.npy', b1_map)
 
 np.save(offsets_dir + '/offsets.npy', cest_offsets)
@@ -196,7 +196,7 @@ print("All fits and parameters completed and saved.")
 def choose_plotting():
     y_or_n = input("Do you want to show and save field maps and amplitudes? ('y' or 'n'): ")
     if y_or_n == "y":
-        if b1_map.any != None:
+        if b1_map is not None:
             plot_field_maps(b0_map, b1_map, plots_dir)
         else:
             plot_b0_only(b0_map, plots_dir)

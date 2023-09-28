@@ -16,6 +16,7 @@ def plot_avg_fits(x, fits, plots_dir):
     for i in range(len(fits)):
         for j in range(len(fits[i])):
             fit = fits[i][j]
+            fit = np.flip(fit)
             fig, ax = plt.subplots(1,1)
             fig.suptitle("5-pool Lorentzian Fits")
             ax.plot(x, fit['Water'], label = "Water")
@@ -23,6 +24,7 @@ def plot_avg_fits(x, fits, plots_dir):
             ax.plot(x, fit['NOE'], label = "NOE")
             ax.plot(x, fit['Creatine'], label = "Creatine")
             ax.plot(x, fit['Amide'], label = "Amide")
+            ax.invert_xaxis()
             ax.legend()
             ##Show##
             plt.show()
@@ -54,13 +56,12 @@ def plot_b0_only(b0_map, plots_dir):
     else:
         ##Add titles##
         fig.suptitle("Field Maps")
-        axs[0].set_title("B0")
+        axs.set_title("B0")
         ##Plot maps##
-        axs[0].imshow(b0_map[:,:,0])
-        axs[0].set_ylabel("Slice 1")
-        for ax in axs:
-            ax.set_xticks([])
-            ax.set_yticks([]) 
+        axs.imshow(b0_map[:,:,0])
+        axs.set_ylabel("Slice 1")
+        axs.set_xticks([])
+        axs.set_yticks([]) 
     ##Show##
     plt.show()
     ##Save plot##
@@ -97,8 +98,8 @@ def plot_field_maps(b0_map, b1_map, plots_dir):
         axs[0].set_title("B0")
         axs[1].set_title("B1")
         ##Plot maps##
-        axs[0].imshow(b0_map[:,:,0])
-        axs[1].imshow(b1_map[:,:,0])
+        axs[0].imshow(b0_map[:,:,0], cmap = b_viridis)
+        axs[1].imshow(b1_map[:,:,0], cmap = b_viridis)
         axs[0].set_ylabel("Slice 1")
         for ax in axs:
             ax.set_xticks([])
